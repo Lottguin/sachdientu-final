@@ -23,8 +23,21 @@ document.addEventListener("DOMContentLoaded", function () {
   pageFlip.loadFromHTML(document.querySelectorAll(".my-page"));
   const tocLinks = document.querySelectorAll(".toc-link");
   tocLinks.forEach(function (link) {
+    // Thư viện page-flip quyết định "có lật trang hay không" ngay từ lúc
+    // nhấn chuột/chạm xuống (mousedown/touchstart), TRƯỚC KHI sự kiện click
+    // xảy ra. Nếu chỉ chặn ở "click" thì đã quá trễ: cú lật đã được kích
+    // hoạt rồi. Chặn lan truyền ngay từ mousedown/touchstart để link mục lục
+    // không bao giờ bị hiểu nhầm thành thao tác lật, trong khi các chỗ khác
+    // trong sách vẫn lật bình thường khi bấm.
+    ["mousedown", "touchstart", "pointerdown"].forEach(function (evt) {
+      link.addEventListener(evt, function (e) {
+        e.stopPropagation();
+      });
+    });
+
     link.addEventListener("click", function (e) {
       e.preventDefault();
+      e.stopPropagation();
       const pageIndex = parseInt(this.dataset.page);
 
       // Dùng turnToPage() thay vì flip(): flip() có animation lật và được
@@ -58,7 +71,7 @@ document.addEventListener("DOMContentLoaded", function () {
   // Go to page
   btnGoto.addEventListener("click", function () {
     const pageNum = parseInt(pageInput.value, 10);
-    const totalPages = pageFlip.getPageCount() + 1;
+    const totalPages = pageFlip.getPageCount();
 
     if (isNaN(pageNum) || pageNum < 1 || pageNum > totalPages) {
       alert(`Vui lòng nhập số trang từ 1 đến ${totalPages}`);
