@@ -57,7 +57,20 @@ document.addEventListener("DOMContentLoaded", function () {
       return;
     }
 
-    pageFlip.flip(pageNum - 1);
+    const targetIndex = pageNum - 1;
+    const currentIndex = pageFlip.getCurrentPageIndex();
+
+    // Nếu đang đứng đúng ở trang được nhập rồi thì không gọi flip() nữa,
+    // vì gọi flip() vào chính trang hiện tại khiến thư viện page-flip
+    // không xác định đúng hướng/góc lật và gây nhảy trang loạn xạ.
+    if (targetIndex === currentIndex) {
+      pageInput.value = "";
+      pageInput.blur();
+      return;
+    }
+
+    pageFlip.flip(targetIndex);
+    pageInput.value = "";
   });
 
   // Cho phép nhấn Enter để đi đến trang
