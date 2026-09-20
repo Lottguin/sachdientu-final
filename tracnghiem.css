@@ -45,7 +45,7 @@ h2 {
   text-align: left;
   cursor: pointer;
   transition: all 0.2s ease;
-  color: black;
+  color: rgb(0, 0, 0);
 }
 
 .option-btn:hover {
