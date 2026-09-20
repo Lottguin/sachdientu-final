@@ -26,7 +26,15 @@ document.addEventListener("DOMContentLoaded", function () {
     link.addEventListener("click", function (e) {
       e.preventDefault();
       const pageIndex = parseInt(this.dataset.page);
-      pageFlip.flip(pageIndex);
+
+      // Dùng turnToPage() thay vì flip(): flip() có animation lật và được
+      // thiết kế cho việc lật từng trang gần nhau (Next/Prev). Khi nhảy xa
+      // (ví dụ từ trang mục lục sang trang 18), flip() phải tính toán qua
+      // nhiều trang trung gian nên đôi khi tính sai và nhảy lộn đến trang
+      // khác (VD trang bìa cuối). turnToPage() nhảy thẳng đến đúng trang,
+      // không animation, nên luôn chính xác.
+      pageFlip.turnToPage(pageIndex);
+      updatePageIndicator();
     });
   });
 
@@ -58,19 +66,13 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
     const targetIndex = pageNum - 1;
-    const currentIndex = pageFlip.getCurrentPageIndex();
 
-    // Nếu đang đứng đúng ở trang được nhập rồi thì không gọi flip() nữa,
-    // vì gọi flip() vào chính trang hiện tại khiến thư viện page-flip
-    // không xác định đúng hướng/góc lật và gây nhảy trang loạn xạ.
-    if (targetIndex === currentIndex) {
-      pageInput.value = "";
-      pageInput.blur();
-      return;
-    }
-
-    pageFlip.flip(targetIndex);
+    // turnToPage(): nhảy thẳng đến trang, không animation -> không bị tính
+    // sai hướng lật / nhảy lộn trang như khi dùng flip() để đi xa nhiều trang.
+    pageFlip.turnToPage(targetIndex);
+    updatePageIndicator();
     pageInput.value = "";
+    pageInput.blur();
   });
 
   // Cho phép nhấn Enter để đi đến trang
@@ -81,12 +83,16 @@ document.addEventListener("DOMContentLoaded", function () {
   });
 
   // Page number
-  pageFlip.on("flip", function (e) {
-    const currentPage = e.data + 1;
+  function updatePageIndicator() {
+    const currentPage = pageFlip.getCurrentPageIndex() + 1;
     const totalPages = pageFlip.getPageCount();
 
     pageIndicator.textContent = `Trang ${currentPage} / ${totalPages}`;
-  });
+  }
+
+  // Sự kiện "flip" chỉ chắc chắn bắn ra khi lật có animation (flipNext/flipPrev).
+  // turnToPage() không animation nên ta tự cập nhật chỉ số trang ngay sau khi gọi.
+  pageFlip.on("flip", updatePageIndicator);
 
   // Responsive
   let resizeTimer;
