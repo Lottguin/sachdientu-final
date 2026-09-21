@@ -5,22 +5,17 @@
 }
 
 html,
-body {
-  width: 100%;
-  height: 100%;
-
-  overflow: hidden;
-}
 
 /* BODY */
-
 body {
   background-color: #f0f2f5;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
   display: flex;
   flex-direction: column;
   align-items: center;
   font-family: Arial, sans-serif;
-  padding: 10px;
   overflow-x: hidden;
   overflow-y: hidden;
 }
@@ -277,11 +272,11 @@ a.toc-link {
   .controls {
     height: 50px;
 
-    gap: 8px;
+    gap: 6.5px;
   }
 
   button {
-    padding: 9px 12px;
+    padding: 3px 12px;
 
     font-size: 13px;
   }
